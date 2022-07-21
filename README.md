@@ -1,4 +1,4 @@
-CryptoLiquidity is a Java console application that allows Kraken account holders to send bids and offers for the ETH-BTC trading pair. The idea of this market maker is to accumulate ETH and BTC at first through the ETH-USD and BTC-USD markets via bids and then, once ETH and BTC tokens have been acquired, buy and sell them via ETH-BTC when one of these tokens are less favorable.
+CryptoLiquidity is a Java console application that allows Kraken account holders to send bids and offers for the ETH-BTC trading pair. The idea of this market maker is to accumulate ETH and BTC at first through the ETH-USD and BTC-USD markets via bids and then, once ETH and BTC tokens have been acquired, buy and sell them via ETH-BTC when one of these tokens is less favorable.
 
 ## Installation
 CryptoLiquidity requires a JDK and Apache Maven.
