@@ -21,7 +21,7 @@
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20220320</version>
-      <scope>all</scope>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
