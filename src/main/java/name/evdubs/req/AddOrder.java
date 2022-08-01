@@ -15,15 +15,15 @@ public record AddOrder(
   String type,
   BigDecimal volume,
   long nonce) implements HasPayload {
-  static MathContext mc3 = new MathContext(3);
+  static MathContext mc4 = new MathContext(4);
   static Charset utf8 = StandardCharsets.UTF_8;
 
   public AddOrder(String orderType, String pair, BigDecimal price, String type, BigDecimal volume) {
     this(orderType,
       pair,
-      price.round(mc3),
+      price.round(mc4),
       type,
-      volume.round(mc3),
+      volume.round(mc4),
       Nonce.get());
   }
 
@@ -39,7 +39,8 @@ public record AddOrder(
       "pair=" + URLEncoder.encode(pair, utf8) + "&" +
       "price=" + price.toPlainString() + "&" +
       "type=" + URLEncoder.encode(type, utf8) + "&" +
-      "volume=" + volume.toPlainString();
+      "volume=" + volume.toPlainString() + "&" +
+      "oflags=post";
   }
   
   @Override

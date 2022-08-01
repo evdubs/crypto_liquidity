@@ -14,14 +14,14 @@ public record EditOrder(
   BigDecimal price,
   BigDecimal volume,
   long nonce) implements HasPayload {
-  static MathContext mc3 = new MathContext(3);
+  static MathContext mc4 = new MathContext(4);
   static Charset utf8 = StandardCharsets.UTF_8;
 
   public EditOrder(String transactionId, String pair, BigDecimal price, BigDecimal volume) {
     this(transactionId,
       pair,
-      price.round(mc3),
-      volume.round(mc3),
+      price.round(mc4),
+      volume.round(mc4),
       Nonce.get());
   }
 
@@ -36,7 +36,8 @@ public record EditOrder(
       "txid=" + URLEncoder.encode(transactionId, utf8) + "&" +
       "pair=" + URLEncoder.encode(pair, utf8) + "&" +
       "price=" + price.toPlainString() + "&" +
-      "volume=" + volume.toPlainString();
+      "volume=" + volume.toPlainString() + "&" +
+      "oflags=post";
   }
   
   @Override
