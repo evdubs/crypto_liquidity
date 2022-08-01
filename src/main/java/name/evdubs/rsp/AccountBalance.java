@@ -20,7 +20,7 @@ public class AccountBalance {
   }
 
   public BigDecimal getBalance(String symbol) {
-    return balances.get(symbol);
+    return balances.getOrDefault(symbol, BigDecimal.ZERO);
   }
 
   @Override

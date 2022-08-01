@@ -89,64 +89,52 @@ public class KrakenHttpClient {
     return new JSONObject(response.body());
   }
 
-  public OrderAdded addOrder(AddOrder req) {
+  public OrderAdded addOrder(AddOrder req) throws KrakenException {
     var response = new JSONObject();
 
     try {
       response = post(req);
-      System.out.println(response.toString());
+      System.out.println(dtf.format(Instant.now()) + " " + response.toString());
       return new OrderAdded(response.getJSONObject("result"));
     } catch (InvalidKeyException | NoSuchAlgorithmException | IOException | InterruptedException | JSONException e) {
-      System.out.println(dtf.format(Instant.now()) + " " + response.toString());
-      e.printStackTrace();
+      throw new KrakenException("addOrder response=" + response.toString(), e);
     }
-
-    return new OrderAdded("", "", new ArrayList<String>());
   }
 
-  public OrdersCanceled cancelAll() {
+  public OrdersCanceled cancelAll() throws KrakenException {
     var response = new JSONObject();
 
     try {
       response = post(new CancelAll());
       return new OrdersCanceled(response.getJSONObject("result"));
     } catch (InvalidKeyException | NoSuchAlgorithmException | IOException | InterruptedException | JSONException e) {
-      System.out.println(dtf.format(Instant.now()) + " " + response.toString());
-      e.printStackTrace();
+      throw new KrakenException("cancelAll response=" + response.toString(), e);
     }
-
-    return new OrdersCanceled(0);
   }
 
-  public OrdersCanceled cancelOrder(CancelOrder req) {
+  public OrdersCanceled cancelOrder(CancelOrder req) throws KrakenException {
     var response = new JSONObject();
 
     try {
       response = post(req);
       return new OrdersCanceled(response.getJSONObject("result"));
     } catch (InvalidKeyException | NoSuchAlgorithmException | IOException | InterruptedException | JSONException e) {
-      System.out.println(dtf.format(Instant.now()) + " " + response.toString());
-      e.printStackTrace();
+      throw new KrakenException("cancelOrder response=" + response.toString(), e);
     }
-
-    return new OrdersCanceled(0);
   }
 
-  public AccountBalance getAccountBalance(GetAccountBalance req) {
+  public AccountBalance getAccountBalance(GetAccountBalance req) throws KrakenException {
     var response = new JSONObject();
 
     try {
       response = post(req);
       return new AccountBalance(response);
     } catch (InvalidKeyException | NoSuchAlgorithmException | IOException | InterruptedException | JSONException e) {
-      System.out.println(dtf.format(Instant.now()) + " " + response.toString());
-      e.printStackTrace();
+      throw new KrakenException("getAccountBalance response=" + response.toString(), e);
     }
-
-    return new AccountBalance(new JSONObject("{\"result\": {}}"));
   }
 
-  public List<OpenOrder> getOpenOrders(GetOpenOrders req) {
+  public List<OpenOrder> getOpenOrders(GetOpenOrders req) throws KrakenException {
     var response = new JSONObject();
     var orders = new ArrayList<OpenOrder>();
 
@@ -160,14 +148,13 @@ public class KrakenHttpClient {
         }
       }
     } catch (InvalidKeyException | NoSuchAlgorithmException | IOException | InterruptedException | JSONException e) {
-      System.out.println(dtf.format(Instant.now()) + " " + response.toString());
-      e.printStackTrace();
+      throw new KrakenException("getOpenOrders response=" + response.toString(), e);
     }
 
     return orders;
   }
 
-  public Map<OrderAction, List<OrderBookEntry>> getOrderBook(GetOrderBook req) {
+  public Map<OrderAction, List<OrderBookEntry>> getOrderBook(GetOrderBook req) throws KrakenException {
     var response = new JSONObject();
     var book = new HashMap<OrderAction, List<OrderBookEntry>>();
 
@@ -188,25 +175,20 @@ public class KrakenHttpClient {
         }
       }
     } catch (InvalidKeyException | NoSuchAlgorithmException | IOException | InterruptedException | JSONException e) {
-      System.out.println(dtf.format(Instant.now()) + " " + response.toString());
-      e.printStackTrace();
+      throw new KrakenException("getOrderBook response=" + response.toString(), e);
     }
 
     return book;
   }
 
-  public WebSocketsToken getWebSocketsToken(GetWebSocketsToken req) {
+  public WebSocketsToken getWebSocketsToken(GetWebSocketsToken req) throws KrakenException {
     var response = new JSONObject();
 
     try {
       response = post(req);
       return new WebSocketsToken(post(req));
     } catch (InvalidKeyException | NoSuchAlgorithmException | IOException | InterruptedException | JSONException e) {
-      System.out.println(dtf.format(Instant.now()) + " " + response.toString());
-      e.printStackTrace();
+      throw new KrakenException("getWebSocketsToken response=" + response.toString(), e);
     }
-
-    return new WebSocketsToken(new JSONObject("{\"result\": {\"token\": \"\"}}"));
   }
-
 }
