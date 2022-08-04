@@ -211,7 +211,7 @@ public class CryptoLiquidity {
         }
 
         if (time.atOffset(ZoneOffset.UTC).getMinute() == 0 && time.atOffset(ZoneOffset.UTC).getSecond() < 30) {
-          println("\tusdBalance:\t\t" + usdBalance +
+          println("\n\tusdBalance:\t\t" + usdBalance +
                   "\n\tbtcBalance:\t\t" + btcBalance +
                   "\n\tethBalance:\t\t" + ethBalance +
                   "\n\tbtcBalanceUsd:\t\t" + btcBalanceUsd +
