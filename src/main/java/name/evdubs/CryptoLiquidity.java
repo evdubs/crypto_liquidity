@@ -23,6 +23,8 @@ import name.evdubs.rsp.OrderAction;
 import name.evdubs.rsp.OrderBookEntry;
 
 public class CryptoLiquidity {
+  static MathContext mc4c = new MathContext(4, RoundingMode.CEILING);
+
   static MathContext mc4f = new MathContext(4, RoundingMode.FLOOR);
 
   static String apiKey = System.getenv("API_KEY");
@@ -33,9 +35,9 @@ public class CryptoLiquidity {
 
   static BigDecimal maxOrders = new BigDecimal(20);
 
-  static BigDecimal highFactor = new BigDecimal("1.017");
+  static BigDecimal highFactor = new BigDecimal("1.0165");
 
-  static BigDecimal lowFactor = new BigDecimal("0.983");
+  static BigDecimal lowFactor = new BigDecimal("0.9835");
 
   static BigDecimal midpoint(Map<OrderAction, List<OrderBookEntry>> book) {
     return book.get(OrderAction.BUY).
@@ -54,7 +56,7 @@ public class CryptoLiquidity {
 
     var desiredPrices = action == OrderAction.BUY
         ? PreferredPrices.getPrices(refPrice.multiply(lowFactor, mc4f), HigherLower.LOWER).descendingSet()
-        : PreferredPrices.getPrices(refPrice.multiply(highFactor, mc4f), HigherLower.HIGHER);
+        : PreferredPrices.getPrices(refPrice.multiply(highFactor, mc4c), HigherLower.HIGHER);
 
     var filteredPrices = desiredPrices.stream().
       toList().
@@ -234,7 +236,7 @@ public class CryptoLiquidity {
                   "\n\tethRemaining:\t\t" + ethRemaining);
         }
       } catch (Exception e) {
-        System.out.println(dtf.format(Instant.now()) + e.getMessage());
+        System.out.println(dtf.format(Instant.now()));
         e.printStackTrace();
       }
 
