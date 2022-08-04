@@ -211,9 +211,7 @@ public class CryptoLiquidity {
         }
 
         if (time.atOffset(ZoneOffset.UTC).getMinute() == 0 && time.atOffset(ZoneOffset.UTC).getSecond() < 30) {
-          System.out.println(dtf.format(Instant.now()));
-          System.out.println(
-              "\tusdBalance:\t\t" + usdBalance +
+          println("\tusdBalance:\t\t" + usdBalance +
                   "\n\tbtcBalance:\t\t" + btcBalance +
                   "\n\tethBalance:\t\t" + ethBalance +
                   "\n\tbtcBalanceUsd:\t\t" + btcBalanceUsd +
@@ -236,15 +234,14 @@ public class CryptoLiquidity {
                   "\n\tethRemaining:\t\t" + ethRemaining);
         }
       } catch (Exception e) {
-        System.out.println(dtf.format(Instant.now()));
+        println("Main loop exception caught");
         e.printStackTrace();
       }
 
       try {
         Thread.sleep(30000, 0);
       } catch (InterruptedException e) {
-        System.out.println(dtf.format(Instant.now()));
-        e.printStackTrace();
+        println("Exception caught while sleeping");
       }
     }
   }
