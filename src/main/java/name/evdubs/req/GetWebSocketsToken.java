@@ -2,11 +2,9 @@ package name.evdubs.req;
 
 import name.evdubs.Nonce;
 
-public class GetWebSocketsToken implements HasPayload {
-  private long nonce;
-
+public record GetWebSocketsToken(long nonce) implements HasPayload {
   public GetWebSocketsToken() {
-    this.nonce = Nonce.get();
+    this(Nonce.get());
   }
 
   @Override

@@ -32,6 +32,7 @@ import name.evdubs.req.CancelOrder;
 import name.evdubs.req.GetAccountBalance;
 import name.evdubs.req.GetOpenOrders;
 import name.evdubs.req.GetOrderBook;
+import name.evdubs.req.GetTradesHistory;
 import name.evdubs.req.GetWebSocketsToken;
 import name.evdubs.req.HasPayload;
 import name.evdubs.rsp.AccountBalance;
@@ -40,6 +41,7 @@ import name.evdubs.rsp.OrderAction;
 import name.evdubs.rsp.OrderAdded;
 import name.evdubs.rsp.OrderBookEntry;
 import name.evdubs.rsp.OrdersCanceled;
+import name.evdubs.rsp.Trade;
 import name.evdubs.rsp.WebSocketsToken;
 
 public class KrakenHttpClient {
@@ -179,6 +181,25 @@ public class KrakenHttpClient {
     }
 
     return book;
+  }
+
+  public List<Trade> getTradesHistory(GetTradesHistory req) throws KrakenException {
+    var response = new JSONObject();
+    var tradesHistory = new ArrayList<Trade>();
+
+    try {
+      response = post(req);
+      var result = response.getJSONObject("result");
+      var trades = result.getJSONObject("trades");
+      for (String transactionId : trades.keySet()) {
+        var trade = trades.getJSONObject(transactionId);
+        tradesHistory.add(new Trade(transactionId, trade));
+      }
+    } catch (InvalidKeyException | NoSuchAlgorithmException | JSONException | IOException | InterruptedException e) {
+      throw new KrakenException("getTradesHistory response=" + response.toString(), e);
+    }
+
+    return tradesHistory;
   }
 
   public WebSocketsToken getWebSocketsToken(GetWebSocketsToken req) throws KrakenException {

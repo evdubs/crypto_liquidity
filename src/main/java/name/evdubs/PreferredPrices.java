@@ -43,8 +43,7 @@ public class PreferredPrices {
     Arrays.
       asList(nums).
       stream().
-      map(p -> new BigDecimal(p, mc4)).
-      collect(Collectors.toCollection(ArrayList::new)));
+      map(p -> new BigDecimal(p, mc4)).toList());
 
   enum HigherLower {
     HIGHER,

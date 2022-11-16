@@ -33,7 +33,7 @@ public class CryptoLiquidity {
 
   static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX").withZone(ZoneId.of("Z"));
 
-  static BigDecimal maxOrders = new BigDecimal(20);
+  static BigDecimal maxOrders = new BigDecimal(30);
 
   static BigDecimal highFactor = new BigDecimal("1.0165");
 

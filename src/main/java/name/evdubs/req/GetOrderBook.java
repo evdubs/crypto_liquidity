@@ -2,22 +2,13 @@ package name.evdubs.req;
 
 import name.evdubs.Nonce;
 
-public class GetOrderBook implements HasPayload {
-  private long nonce;
-
-  private String pair;
-
-  private int count;
-
+public record GetOrderBook(String pair, int count, long nonce) implements HasPayload {
   public GetOrderBook(String pair) {
-    this.pair = pair;
-    this.count = 1;
+    this(pair, 1, Nonce.get());
   }
 
   public GetOrderBook(String pair, int count) {
-    this.nonce = Nonce.get();
-    this.pair = pair;
-    this.count = count;
+    this(pair, count, Nonce.get());
   }
 
   @Override

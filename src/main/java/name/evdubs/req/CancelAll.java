@@ -2,11 +2,9 @@ package name.evdubs.req;
 
 import name.evdubs.Nonce;
 
-public class CancelAll implements HasPayload {
-  long nonce;
-
+public record CancelAll(long nonce) implements HasPayload {
   public CancelAll() {
-    nonce = Nonce.get();
+    this(Nonce.get());
   }
 
   @Override

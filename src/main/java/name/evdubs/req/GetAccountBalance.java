@@ -2,11 +2,9 @@ package name.evdubs.req;
 
 import name.evdubs.Nonce;
 
-public class GetAccountBalance implements HasPayload {
-  private long nonce;
-
+public record GetAccountBalance(long nonce) implements HasPayload {
   public GetAccountBalance() {
-    this.nonce = Nonce.get();
+    this(Nonce.get());
   }
 
   @Override

@@ -2,35 +2,21 @@ package name.evdubs.req;
 
 import name.evdubs.Nonce;
 
-public class GetOpenOrders implements HasPayload {
-  private long nonce;
-
-  private boolean trades;
-
-  private String userRef;
-
+public record GetOpenOrders(boolean trades, String userRef, long nonce) implements HasPayload {
   public GetOpenOrders() {
-    this.nonce = Nonce.get();
-    this.trades = false;
-    this.userRef = "";
+    this(false, "", Nonce.get());
   }
  
   public GetOpenOrders(boolean trades) {
-    this.nonce = Nonce.get();
-    this.trades = trades;
-    this.userRef = "";
+    this(trades, "", Nonce.get());
   }
 
   public GetOpenOrders(String userRef) {
-    this.nonce = Nonce.get();
-    this.trades = false;
-    this.userRef = userRef;
+    this(false, userRef, Nonce.get());
   }
 
   public GetOpenOrders(boolean trades, String userRef) {
-    this.nonce = Nonce.get();
-    this.trades = trades;
-    this.userRef = userRef;
+    this(trades, userRef, Nonce.get());
   }
 
   @Override
