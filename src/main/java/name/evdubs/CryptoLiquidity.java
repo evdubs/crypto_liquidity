@@ -233,6 +233,12 @@ public class CryptoLiquidity {
                   "\n\tethOrderTotal:\t\t" + ethOrderTotal +
                   "\n\tethRemaining:\t\t" + ethRemaining);
         }
+
+        // Kick the GC daily
+        if (time.atOffset(ZoneOffset.UTC).getHour() == 0 && time.atOffset(ZoneOffset.UTC).getMinute() == 0 &&
+          time.atOffset(ZoneOffset.UTC).getSecond() < 30) {
+          System.gc();
+        }
       } catch (Exception e) {
         println("Main loop exception caught");
         e.printStackTrace();
