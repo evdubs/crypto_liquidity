@@ -16,8 +16,12 @@ public enum OrderAction {
 
   public static OrderAction fromString(String s) {
     switch (s) {
+      case "b":
+        return BUY;
       case "buy":
         return BUY;
+      case "s":
+        return SELL;
       case "sell":
         return SELL;
       default:

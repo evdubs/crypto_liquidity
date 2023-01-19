@@ -6,10 +6,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 
+import name.evdubs.req.GetTrades;
 import name.evdubs.req.GetTradesHistory;
-import name.evdubs.rsp.Trade;
+import name.evdubs.rsp.AuthenticatedTrade;
+import name.evdubs.rsp.PublicTrade;
 
 public class SaveTrades {
   static String apiKey = System.getenv("API_KEY");
@@ -18,7 +21,7 @@ public class SaveTrades {
 
   static String dbStr = System.getenv("DB");
   
-  private static void persistTrades(Connection db, List<Trade> trades) throws SQLException {
+  private static void persistTrades(Connection db, List<AuthenticatedTrade> trades) throws SQLException {
     PreparedStatement st = db.prepareStatement("""
 insert into
   kraken.trade
@@ -47,7 +50,7 @@ insert into
 ) on conflict (transaction_id) do nothing;
     """);
 
-    for (Trade t : trades) {
+    for (AuthenticatedTrade t : trades) {
       st.setString(1, t.transactionId());
       st.setString(2, t.orderTransactionId());
       st.setString(3, t.pair());
@@ -66,6 +69,99 @@ insert into
     System.out.println("Saved " + trades.size() + " trades");
   }
 
+  private static List<PublicTrade> getTrades(KrakenHttpClient kraken, String pair, 
+    Instant tradeTime, Instant startTime) throws KrakenException {
+    var trades = kraken.getTrades(new GetTrades(pair, startTime));
+    var minTime = trades.stream().min(Comparator.comparing(PublicTrade::time)).get();
+    var maxTime = trades.stream().max(Comparator.comparing(PublicTrade::time)).get();
+
+    try {
+      Thread.sleep(5000);
+    } catch (InterruptedException e) {
+      System.out.println("Sleep interrupted");
+    }
+
+    if (minTime.time().compareTo(tradeTime) > 0) {
+      System.out.println("Going back a minute for " + pair + " at " + 
+        startTime.toString() + " to find " + tradeTime.toString());
+      return getTrades(kraken, pair, tradeTime, startTime.minus(1, ChronoUnit.MINUTES));
+    } else if (maxTime.time().compareTo(tradeTime) < 0) {
+      System.out.println("Going forward a second for " + pair + " at " + 
+        maxTime.time().toString() + " to find " + tradeTime.toString());
+      return getTrades(kraken, pair, tradeTime, maxTime.time().plus(1, ChronoUnit.SECONDS));
+    } else {
+      return trades;
+    }
+  }
+
+  private static void persistReferencePrices(Connection db, KrakenHttpClient kraken, List<AuthenticatedTrade> trades) 
+    throws KrakenException, SQLException {
+    PreparedStatement st = db.prepareStatement("""
+insert into
+  kraken.usd_reference_price
+(
+  transaction_id,
+  base_currency_pair,
+  base_currency_price,
+  base_currency_volume,
+  base_currency_timestamp,
+  counter_currency_pair,
+  counter_currency_price,
+  counter_currency_volume,
+  counter_currency_timestamp
+) values (
+  ?,
+  ?,
+  ?,
+  ?,
+  ?::text::timestamptz,
+  ?,
+  ?,
+  ?,
+  ?::text::timestamptz
+) on conflict (transaction_id) do nothing;
+    """);
+
+    for (AuthenticatedTrade t : trades) {
+      if ("XETHXXBT".equals(t.pair())) {
+        var ethusd = getTrades(kraken, "XETHZUSD", t.time(), t.time().minus(3, ChronoUnit.MINUTES));
+        var ethusdTrade = ethusd.
+          stream().
+          reduce(ethusd.get(0), (latest, trade) -> {
+            if (trade.time().compareTo(t.time()) <= 0)
+              return trade;
+            else
+              return latest;
+          });
+
+        var btcusd = getTrades(kraken, "XXBTZUSD", t.time(), t.time().minus(1, ChronoUnit.MINUTES));
+        var btcusdTrade = btcusd.
+          stream().
+          reduce(btcusd.get(0), (latest, trade) -> {
+            if (trade.time().compareTo(t.time()) <= 0)
+              return trade;
+            else
+              return latest;
+          });
+
+        st.setString(1, t.transactionId());
+        st.setString(2, ethusdTrade.pair());
+        st.setBigDecimal(3, ethusdTrade.price());
+        st.setBigDecimal(4, ethusdTrade.volume());
+        st.setString(5, ethusdTrade.time().toString());
+        st.setString(6, btcusdTrade.pair());
+        st.setBigDecimal(7, btcusdTrade.price());
+        st.setBigDecimal(8, btcusdTrade.volume());
+        st.setString(9, btcusdTrade.time().toString());
+        st.addBatch();
+      }
+    }
+
+    st.executeBatch();
+
+    System.out.println("Saved prices for " + trades.size() + " trades");
+  }
+
   public static void main(String[] args) {
     var kraken = new KrakenHttpClient(apiKey, apiSecret);
     var start = Instant.now().minus(2, ChronoUnit.DAYS);
@@ -78,15 +174,19 @@ insert into
 
       persistTrades(db, trades);
 
+      persistReferencePrices(db, kraken, trades);
+
       // getTradesHistory will only return 50 trades max; attempt to get the rest here
       while (trades.size() == 50) {
-        var earliest = trades.stream().map(Trade::time).min(Instant::compareTo).get();
+        var earliest = trades.stream().map(AuthenticatedTrade::time).min(Instant::compareTo).get();
 
         System.out.println("earliest: " + earliest);
 
         trades = kraken.getTradesHistory(new GetTradesHistory(start, earliest));
 
         persistTrades(db, trades);
+
+        persistReferencePrices(db, kraken, trades);
       }
     } catch (KrakenException | SQLException e) {
       e.printStackTrace();

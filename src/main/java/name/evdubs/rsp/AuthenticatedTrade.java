@@ -5,7 +5,7 @@ import java.time.Instant;
 
 import org.json.JSONObject;
 
-public record Trade(
+public record AuthenticatedTrade(
   String transactionId,
   String orderTransactionId,
   String pair,
@@ -17,7 +17,7 @@ public record Trade(
   BigDecimal fee,
   BigDecimal volume
 ) {
-  public Trade(String transactionId, JSONObject jo) {
+  public AuthenticatedTrade(String transactionId, JSONObject jo) {
     this(transactionId,
       jo.getString("ordertxid"),
       jo.getString("pair"),

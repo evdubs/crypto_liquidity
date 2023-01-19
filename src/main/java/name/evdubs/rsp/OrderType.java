@@ -21,8 +21,12 @@ public enum OrderType {
 
   public static OrderType fromString(String s) {
     switch (s) {
+      case "m":
+        return MARKET;
       case "market":
         return MARKET;
+      case "l":
+        return LIMIT;
       case "limit":
         return LIMIT;
       case "stop-loss":

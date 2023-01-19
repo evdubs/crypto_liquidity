@@ -30,18 +30,22 @@ import name.evdubs.req.AddOrder;
 import name.evdubs.req.CancelAll;
 import name.evdubs.req.CancelOrder;
 import name.evdubs.req.GetAccountBalance;
+import name.evdubs.req.GetOhlc;
 import name.evdubs.req.GetOpenOrders;
 import name.evdubs.req.GetOrderBook;
+import name.evdubs.req.GetTrades;
 import name.evdubs.req.GetTradesHistory;
 import name.evdubs.req.GetWebSocketsToken;
 import name.evdubs.req.HasPayload;
 import name.evdubs.rsp.AccountBalance;
+import name.evdubs.rsp.Ohlc;
 import name.evdubs.rsp.OpenOrder;
 import name.evdubs.rsp.OrderAction;
 import name.evdubs.rsp.OrderAdded;
 import name.evdubs.rsp.OrderBookEntry;
 import name.evdubs.rsp.OrdersCanceled;
-import name.evdubs.rsp.Trade;
+import name.evdubs.rsp.PublicTrade;
+import name.evdubs.rsp.AuthenticatedTrade;
 import name.evdubs.rsp.WebSocketsToken;
 
 public class KrakenHttpClient {
@@ -136,6 +140,28 @@ public class KrakenHttpClient {
     }
   }
 
+  public List<Ohlc> getOhlc(GetOhlc req) throws KrakenException {
+    var response = new JSONObject();
+    var ohlcs = new ArrayList<Ohlc>();
+
+    try {
+      response = post(req);
+      JSONObject result = response.getJSONObject("result");
+      for (String key : result.keySet()) {
+        if ("last".equals(key)) {
+          continue;
+        }
+
+        JSONArray candles = result.getJSONArray(key);
+        candles.forEach(c -> ohlcs.add(new Ohlc(key, (JSONArray) c)));
+      }
+    } catch (InvalidKeyException | NoSuchAlgorithmException | JSONException | IOException | InterruptedException e) {
+      throw new KrakenException("getOhlc response=" + response.toString(), e);
+    }
+
+    return ohlcs;
+  }
+
   public List<OpenOrder> getOpenOrders(GetOpenOrders req) throws KrakenException {
     var response = new JSONObject();
     var orders = new ArrayList<OpenOrder>();
@@ -183,9 +209,31 @@ public class KrakenHttpClient {
     return book;
   }
 
-  public List<Trade> getTradesHistory(GetTradesHistory req) throws KrakenException {
+  public List<PublicTrade> getTrades(GetTrades req) throws KrakenException {
     var response = new JSONObject();
-    var tradesHistory = new ArrayList<Trade>();
+    var trades = new ArrayList<PublicTrade>();
+
+    try {
+      response = post(req);
+      var result = response.getJSONObject("result");
+      for (String pair : result.keySet()) {
+        if ("last".equals(pair)) {
+          continue;
+        }
+
+        JSONArray ts = result.getJSONArray(pair);
+        ts.forEach(t -> trades.add(new PublicTrade(pair, (JSONArray) t)));
+      }
+    } catch (InvalidKeyException | NoSuchAlgorithmException | JSONException | IOException | InterruptedException e) {
+      throw new KrakenException("getTrades response=" + response.toString(), e);
+    }
+
+    return trades;
+  }
+
+  public List<AuthenticatedTrade> getTradesHistory(GetTradesHistory req) throws KrakenException {
+    var response = new JSONObject();
+    var tradesHistory = new ArrayList<AuthenticatedTrade>();
 
     try {
       response = post(req);
@@ -193,7 +241,7 @@ public class KrakenHttpClient {
       var trades = result.getJSONObject("trades");
       for (String transactionId : trades.keySet()) {
         var trade = trades.getJSONObject(transactionId);
-        tradesHistory.add(new Trade(transactionId, trade));
+        tradesHistory.add(new AuthenticatedTrade(transactionId, trade));
       }
     } catch (InvalidKeyException | NoSuchAlgorithmException | JSONException | IOException | InterruptedException e) {
       throw new KrakenException("getTradesHistory response=" + response.toString(), e);
