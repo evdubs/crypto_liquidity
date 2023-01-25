@@ -27,7 +27,7 @@ create table kraken.trade (
 create index on kraken.trade (timestamp, pair);
 
 create table kraken.usd_reference_price (
-  transaction_id text NOT null,
+  transaction_id text not null,
   base_currency_pair text null,
   base_currency_price numeric null,
   base_currency_volume numeric null,
@@ -38,4 +38,18 @@ create table kraken.usd_reference_price (
   counter_currency_timestamp timestamptz null,
   constraint usd_reference_price_pkey primary key (transaction_id),
   constraint usd_reference_price_transaction_id_fkey foreign key (transaction_id) references kraken.trade(transaction_id)
+);
+
+create table kraken.capital_gain_loss (
+	symbol text null,
+	acquire_timestamp timestamptz null,
+	acquire_transaction_id text not null,
+	cost_basis numeric null,
+	dispose_timestamp timestamptz null,
+	dispose_transaction_id text not null,
+	proceeds numeric null,
+	gain_loss numeric null,
+	constraint capital_gain_loss_pkey primary key (acquire_transaction_id, dispose_transaction_id),
+	constraint capital_gain_loss_acquire_transaction_id_fkey foreign key (acquire_transaction_id) references kraken.trade(transaction_id),
+	constraint capital_gain_loss_dispose_transaction_id_fkey foreign key (dispose_transaction_id) references kraken.trade(transaction_id)
 );
