@@ -148,7 +148,7 @@ insert into kraken.capital_gain_loss (
   ?,
   ?,
   ?
-);
+) on conflict (acquire_transaction_id, dispose_transaction_id) do nothing;
           """);
       
       for (CapitalGainLoss gl : gainLoss) {
