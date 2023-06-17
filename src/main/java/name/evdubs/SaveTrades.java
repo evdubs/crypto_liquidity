@@ -164,7 +164,7 @@ insert into
 
   public static void main(String[] args) {
     var kraken = new KrakenHttpClient(apiKey, apiSecret);
-    var start = Instant.now().minus(2, ChronoUnit.DAYS);
+    var start = Instant.now().minus(4, ChronoUnit.DAYS);
     var end = Instant.now();
 
     try {
