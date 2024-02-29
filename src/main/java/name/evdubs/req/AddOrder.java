@@ -40,7 +40,7 @@ public record AddOrder(
       "price=" + price.toPlainString() + "&" +
       "type=" + URLEncoder.encode(type, utf8) + "&" +
       "volume=" + volume.toPlainString() + "&" +
-      "oflags=post";
+      "oflags=post," + ("buy".equals(type) ? "fciq" : "fcib");
   }
   
   @Override
