@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
@@ -20,6 +22,12 @@ public class SaveTrades {
   static String apiSecret = System.getenv("API_SECRET");
 
   static String dbStr = System.getenv("DB");
+
+  static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX").withZone(ZoneId.of("Z"));
+
+  static void println(String s) {
+    System.out.println(dtf.format(Instant.now()) + " " + s);
+  }
   
   private static void persistTrades(Connection db, List<AuthenticatedTrade> trades) throws SQLException {
     PreparedStatement st = db.prepareStatement("""
@@ -66,7 +74,7 @@ insert into
 
     st.executeBatch();
 
-    System.out.println("Saved " + trades.size() + " trades");
+    println("Saved " + trades.size() + " trades");
   }
 
   private static List<PublicTrade> getTrades(KrakenHttpClient kraken, String pair, 
@@ -78,15 +86,15 @@ insert into
     try {
       Thread.sleep(5000);
     } catch (InterruptedException e) {
-      System.out.println("Sleep interrupted");
+      println("Sleep interrupted");
     }
 
     if (minTime.time().compareTo(tradeTime) > 0) {
-      System.out.println("Going back a minute for " + pair + " at " + 
+      println("Going back a minute for " + pair + " at " + 
         startTime.toString() + " to find " + tradeTime.toString());
       return getTrades(kraken, pair, tradeTime, startTime.minus(1, ChronoUnit.MINUTES));
     } else if (maxTime.time().compareTo(tradeTime) < 0) {
-      System.out.println("Going forward a second for " + pair + " at " + 
+      println("Going forward a second for " + pair + " at " + 
         maxTime.time().toString() + " to find " + tradeTime.toString());
       return getTrades(kraken, pair, tradeTime, maxTime.time().plus(1, ChronoUnit.SECONDS));
     } else {
@@ -159,7 +167,7 @@ insert into
 
     st.executeBatch();
 
-    System.out.println("Saved prices for " + trades.size() + " trades");
+    println("Saved prices for " + trades.size() + " trades");
   }
 
   public static void main(String[] args) {
@@ -180,7 +188,7 @@ insert into
       while (trades.size() == 50) {
         var earliest = trades.stream().map(AuthenticatedTrade::time).min(Instant::compareTo).get();
 
-        System.out.println("earliest: " + earliest);
+        println("earliest: " + earliest);
 
         trades = kraken.getTradesHistory(new GetTradesHistory(start, earliest));
 
