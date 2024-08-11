@@ -49,7 +49,7 @@ public class SaveCapitalGains {
 
     var gainLoss = new ArrayList<CapitalGainLoss>();
 
-    while (!sells.isEmpty()) {
+    while (!buys.isEmpty() && !sells.isEmpty()) {
       if (currentBuy == null) {
         currentBuy = buys.get(0);
         buys.remove(0);
