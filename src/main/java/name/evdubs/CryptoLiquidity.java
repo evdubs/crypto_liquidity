@@ -105,7 +105,7 @@ public class CryptoLiquidity {
 
         var usdBalance = balance.getBalance("ZUSD");
         var btcBalance = balance.getBalance("XXBT");
-        var ethBalance = balance.getBalance("XETH");
+        var ethBalance = balance.getBalance("XETH").add(balance.getBalance("ETH.F"));
 
         var btcUsdBook = client.getOrderBook(new GetOrderBook("XBTUSD"));
         var ethUsdBook = client.getOrderBook(new GetOrderBook("ETHUSD"));
