@@ -189,7 +189,7 @@ select
 from 
   kraken.trade t
 left outer join
-  kraken.usd_reference_price urp 
+  kraken.trade_usd_reference_price urp
 on
   t.transaction_id = urp.transaction_id
 order by

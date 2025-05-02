@@ -30,6 +30,7 @@ import name.evdubs.req.AddOrder;
 import name.evdubs.req.CancelAll;
 import name.evdubs.req.CancelOrder;
 import name.evdubs.req.GetAccountBalance;
+import name.evdubs.req.GetLedgersInfo;
 import name.evdubs.req.GetOhlc;
 import name.evdubs.req.GetOpenOrders;
 import name.evdubs.req.GetOrderBook;
@@ -46,6 +47,7 @@ import name.evdubs.rsp.OrderBookEntry;
 import name.evdubs.rsp.OrdersCanceled;
 import name.evdubs.rsp.PublicTrade;
 import name.evdubs.rsp.AuthenticatedTrade;
+import name.evdubs.rsp.LedgerEntry;
 import name.evdubs.rsp.WebSocketsToken;
 
 public class KrakenHttpClient {
@@ -138,6 +140,25 @@ public class KrakenHttpClient {
     } catch (InvalidKeyException | NoSuchAlgorithmException | IOException | InterruptedException | JSONException e) {
       throw new KrakenException("getAccountBalance response=" + response.toString(), e);
     }
+  }
+
+  public List<LedgerEntry> getLedgersInfo(GetLedgersInfo req) throws KrakenException {
+    var response = new JSONObject();
+    var ledgersInfo = new ArrayList<LedgerEntry>();
+
+    try {
+      response = post(req);
+      var result = response.getJSONObject("result");
+      var entries = result.getJSONObject("ledger");
+      for (String entryId : entries.keySet()) {
+        var entry = entries.getJSONObject(entryId);
+        ledgersInfo.add(new LedgerEntry(entryId, entry));
+      }
+    } catch (InvalidKeyException | NoSuchAlgorithmException | JSONException | IOException | InterruptedException e) {
+      throw new KrakenException("getLedgersInfo response=" + response.toString(), e);
+    }
+
+    return ledgersInfo;
   }
 
   public List<Ohlc> getOhlc(GetOhlc req) throws KrakenException {

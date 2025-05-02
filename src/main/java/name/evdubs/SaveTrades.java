@@ -106,7 +106,7 @@ insert into
     throws KrakenException, SQLException {
     PreparedStatement st = db.prepareStatement("""
 insert into
-  kraken.usd_reference_price
+  kraken.trade_usd_reference_price
 (
   transaction_id,
   base_currency_pair,
@@ -186,6 +186,12 @@ insert into
 
       // getTradesHistory will only return 50 trades max; attempt to get the rest here
       while (trades.size() == 50) {
+        try {
+          Thread.sleep(5000);
+        } catch (InterruptedException e) {
+          println("Sleep interrupted");
+        }
+
         var earliest = trades.stream().map(AuthenticatedTrade::time).min(Instant::compareTo).get();
 
         println("earliest: " + earliest);
