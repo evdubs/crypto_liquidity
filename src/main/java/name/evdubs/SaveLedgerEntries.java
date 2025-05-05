@@ -74,7 +74,7 @@ insert into
 
     st.executeBatch();
 
-    println("Saved " + ledgers.size() + " ledgers");
+    println("Saved " + ledgers.size() + " ledger entries");
   }
 
   private static List<PublicTrade> getTrades(KrakenHttpClient kraken, String pair, 
