@@ -33,7 +33,7 @@ public class CryptoLiquidity {
 
   static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX").withZone(ZoneId.of("Z"));
 
-  static BigDecimal maxOrders = new BigDecimal(30);
+  static BigDecimal maxOrders = new BigDecimal(60);
 
   static BigDecimal highFactor = new BigDecimal("1.0165");
 
@@ -104,7 +104,7 @@ public class CryptoLiquidity {
         var balance = client.getAccountBalance(new GetAccountBalance());
 
         var usdBalance = balance.getBalance("ZUSD");
-        var btcBalance = balance.getBalance("XXBT");
+        var btcBalance = balance.getBalance("XXBT").add(balance.getBalance("XBT.F"));
         var ethBalance = balance.getBalance("XETH").add(balance.getBalance("ETH.F"));
 
         var btcUsdBook = client.getOrderBook(new GetOrderBook("XBTUSD"));
