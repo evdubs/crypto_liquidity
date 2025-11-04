@@ -93,6 +93,12 @@ public class CryptoLiquidity {
     // Use for() instead of a lambda because addOrder can throw an exception
     for (AddOrder o : newOrders) {
       client.addOrder(o);
+
+      try {
+        Thread.sleep(5000, 0);
+      } catch (InterruptedException e) {
+        println("Exception caught while sleeping");
+      }
     }
   }
 
