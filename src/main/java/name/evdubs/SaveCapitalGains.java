@@ -207,7 +207,7 @@ order by
         var base = pair.substring(0, 4);
         var counter = pair.substring(4, 8);
 
-        if ("XXBTZUSD".equals(pair)) {
+        if ("XXBTZUSD".equals(pair) || "XXBTUSDT".equals(pair)) {
           btc.add(new UsdTrade(
             rs.getString("transaction_id"), 
             base, 
@@ -217,7 +217,7 @@ order by
             rs.getBigDecimal("volume"), 
             rs.getBigDecimal("fee"), 
             rs.getBigDecimal("cost")));
-        } else if ("XETHZUSD".equals(pair)) {
+        } else if ("XETHZUSD".equals(pair) || "XETHUSDT".equals(pair)) {
           eth.add(new UsdTrade(
             rs.getString("transaction_id"), 
             base, 
