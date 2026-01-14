@@ -157,6 +157,23 @@ insert into
         st.setBigDecimal(4, btcusdTrade.volume());
         st.setString(5, btcusdTrade.time().toString());
         st.addBatch();
+      } else if (e.asset().startsWith("BABY")) {
+        var babyusd = getTrades(kraken, "BABYUSD", e.time(), e.time().minus(1, ChronoUnit.MINUTES));
+        var babyusdTrade = babyusd.
+          stream().
+          reduce(babyusd.get(0), (latest, trade) -> {
+            if (trade.time().compareTo(e.time()) <= 0)
+              return trade;
+            else
+              return latest;
+          });
+
+        st.setString(1, e.entryId());
+        st.setString(2, babyusdTrade.pair());
+        st.setBigDecimal(3, babyusdTrade.price());
+        st.setBigDecimal(4, babyusdTrade.volume());
+        st.setString(5, babyusdTrade.time().toString());
+        st.addBatch();
       }
     }
 
