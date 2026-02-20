@@ -245,6 +245,12 @@ public class CryptoLiquidity {
           time.atOffset(ZoneOffset.UTC).getSecond() < 30) {
           System.gc();
         }
+
+        // Cancel all orders once a month to make sure everything is sized correctly
+        if (time.atOffset(ZoneOffset.UTC).getDayOfMonth() == 1 && time.atOffset(ZoneOffset.UTC).getHour() == 0 &&
+          time.atOffset(ZoneOffset.UTC).getMinute() == 0 && time.atOffset(ZoneOffset.UTC).getSecond() < 30) {
+          client.cancelAll();
+        }
       } catch (Exception e) {
         println("Main loop exception caught");
         e.printStackTrace();
